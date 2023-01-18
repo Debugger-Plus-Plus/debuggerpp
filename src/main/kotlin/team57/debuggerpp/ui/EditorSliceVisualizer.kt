@@ -83,16 +83,16 @@ class EditorSliceVisualizer(private val project: Project, private val slice: Pro
         if (file !is PsiJavaFile)
             return
 
-        var match = false
-        for (clazz in file.classes)
-            match = match || slice.sliceLinesUnordered.contains(clazz.qualifiedName)
-        if (!match)
-            return
+        val sliceLines = HashSet<Int>()
+        for (clazz in file.classes) {
+            slice.sliceLinesUnordered[clazz.qualifiedName]?.let { lines ->
+                sliceLines.addAll(lines)
+            }
+        }
 
-        slice.sliceLinesUnordered
-
-        val nonSliceLines = arrayOf(7, 8, 10, 11, 13, 15)
-        for (line in nonSliceLines) {
+        for (line in 1..textEditor.editor.document.lineCount) {
+            if (sliceLines.contains(line))
+                continue
             textEditor.editor.markupModel.addLineHighlighter(
                 line - 1,
                 HighlighterLayer.SELECTION + 1,
