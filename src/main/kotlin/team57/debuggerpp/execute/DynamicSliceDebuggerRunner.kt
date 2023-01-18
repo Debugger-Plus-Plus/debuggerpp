@@ -14,14 +14,12 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.util.Key
-import com.intellij.xdebugger.XDebugProcess
-import com.intellij.xdebugger.XDebugProcessStarter
-import com.intellij.xdebugger.XDebugSession
-import com.intellij.xdebugger.XDebuggerManager
+import com.intellij.xdebugger.*
 import com.intellij.xdebugger.impl.XDebugSessionImpl
 import team57.debuggerpp.slicer.JavaSlicer
 import team57.debuggerpp.slicer.ProgramSlice
 import team57.debuggerpp.trace.SliceJavaDebugProcess
+import team57.debuggerpp.ui.EditorSliceVisualizer
 import java.awt.Desktop
 import java.util.concurrent.atomic.AtomicReference
 
@@ -62,12 +60,11 @@ class DynamicSliceDebuggerRunner : GenericDebuggerRunner() {
                 val debuggerSession =
                     DebuggerManagerEx.getInstanceEx(env.project).attachVirtualMachine(environment)
                         ?: return@invokeAndWait
-                val debugProcess = debuggerSession.process
-                result.set(
+                val session =
                     XDebuggerManager.getInstance(env.project).startSession(env, object : XDebugProcessStarter() {
                         override fun start(session: XDebugSession): XDebugProcess {
                             val sessionImpl = session as XDebugSessionImpl
-                            val executionResult = debugProcess.executionResult
+                            val executionResult = debuggerSession.process.executionResult
                             sessionImpl.addExtraActions(*executionResult.actions)
                             if (executionResult is DefaultExecutionResult) {
                                 sessionImpl.addRestartActions(*executionResult.restartActions)
@@ -75,8 +72,16 @@ class DynamicSliceDebuggerRunner : GenericDebuggerRunner() {
                             val slice = env.getUserData(SLICE_KEY)
                             return SliceJavaDebugProcess.create(session, debuggerSession, slice)
                         }
-                    }).runContentDescriptor
-                )
+                    })
+                val editorSliceVisualizer = EditorSliceVisualizer(env.project, env.getUserData(SLICE_KEY)!!)
+                editorSliceVisualizer.start()
+                session.addSessionListener(object : XDebugSessionListener {
+                    override fun sessionStopped() {
+                        super.sessionStopped()
+                        editorSliceVisualizer.stop()
+                    }
+                })
+                result.set(session.runContentDescriptor)
             } catch (e: ExecutionException) {
                 ex.set(e)
             }
