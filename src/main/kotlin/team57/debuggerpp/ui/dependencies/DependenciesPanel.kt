@@ -1,8 +1,10 @@
 package team57.debuggerpp.ui.dependencies
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
@@ -48,22 +50,32 @@ abstract class DependenciesPanel(protected val project: Project) : JPanel() {
         val l = JButton()
         val searchScope = GlobalSearchScope.allScope(project)
         var clazz: PsiClass? = null
+        var displayName = dependency.location.clazz
+        var lineText = ""
 
         ApplicationManager.getApplication().invokeAndWait {
             clazz = JavaPsiFacade.getInstance(project).findClass(dependency.location.clazz, searchScope)
         }
 
         clazz?.containingFile?.let { file ->
+            val logicalLineNo = dependency.location.lineNo - 1
+            displayName = file.name
             l.addActionListener {
-                OpenFileDescriptor(project, file.virtualFile, dependency.location.lineNo - 1, Int.MAX_VALUE)
+                OpenFileDescriptor(project, file.virtualFile, logicalLineNo, Int.MAX_VALUE)
                     .navigate(false)
+            }
+            val document = FileDocumentManager.getInstance().getDocument(file.virtualFile)
+            if (document != null) {
+                val start = document.getLineStartOffset(logicalLineNo)
+                val end = document.getLineEndOffset(logicalLineNo)
+                lineText = document.getText(TextRange(start, end))
             }
         }
 
         l.text = "<html>${prefix}" +
-                "<font color='#5693E2'>" +
-                "${dependency.location.clazz} at Line ${dependency.location.lineNo}" +
-                "</font>" +
+                "<font color='#5693E2'>$displayName at ${dependency.location.lineNo}</font>" +
+                "&nbsp&nbsp" +
+                "<font color='#999999'>$lineText</font>" +
                 "</html>"
 
         l.isFocusPainted = false
@@ -71,8 +83,9 @@ abstract class DependenciesPanel(protected val project: Project) : JPanel() {
         l.isContentAreaFilled = false
         l.isBorderPainted = false
         l.isOpaque = false
-        l.maximumSize = Dimension(l.preferredSize.width, 18)
         l.border = BorderFactory.createEmptyBorder(0, 10, 0, 0)
+        l.horizontalAlignment = SwingConstants.LEFT
+        l.maximumSize = Dimension(l.preferredSize.width, 18)
 
         add(l)
     }
