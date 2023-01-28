@@ -28,22 +28,23 @@ class DebuggerListener : XDebuggerManagerListener {
         if (debugProcess !is SliceJavaDebugProcess) {
             return
         }
-        val debugSession: XDebugSession = debugProcess.session
-        val sliceVisualizer = EditorSliceVisualizer(debugProcess.session.project, debugProcess.slice)
-        val dataDepPanel = DataDependenciesPanel()
-        val controlDepPanel = ControlDependenciesPanel()
+        val session: XDebugSession = debugProcess.session
+        val project = session.project
+        val sliceVisualizer = EditorSliceVisualizer(project, debugProcess.slice)
+        val dataDepPanel = DataDependenciesPanel(project)
+        val controlDepPanel = ControlDependenciesPanel(project)
 
-        debugSession.addSessionListener(object : XDebugSessionListener {
+        session.addSessionListener(object : XDebugSessionListener {
             override fun sessionPaused() {
                 ApplicationManager.getApplication().invokeAndWait {
-                    updateDependenciesTabs(debugSession, debugProcess.slice, dataDepPanel, controlDepPanel)
+                    updateDependenciesTabs(session, debugProcess.slice, dataDepPanel, controlDepPanel)
                 }
             }
         })
 
         debugProcess.processHandler.addProcessListener(object : ProcessListener {
             override fun startNotified(processEvent: ProcessEvent) {
-                initDebuggerUI(debugSession, dataDepPanel, controlDepPanel)
+                initDebuggerUI(session, dataDepPanel, controlDepPanel)
                 sliceVisualizer.start()
             }
 
@@ -89,15 +90,13 @@ class DebuggerListener : XDebuggerManagerListener {
     }
 
     private fun updateDependenciesTabs(
-        debugSession: XDebugSession,
-        slice: ProgramSlice,
-        dataDepPanel: DataDependenciesPanel,
-        controlDepPanel: ControlDependenciesPanel
+        session: XDebugSession, slice: ProgramSlice,
+        dataPanel: DataDependenciesPanel, controlPanel: ControlDependenciesPanel
     ) {
         // Get current position
-        val currentPosition = debugSession.currentPosition ?: return
+        val currentPosition = session.currentPosition ?: return
         // Find class name
-        val file = PsiManager.getInstance(debugSession.project).findFile(currentPosition.file)
+        val file = PsiManager.getInstance(session.project).findFile(currentPosition.file)
             ?: return
         val element = file.findElementAt(currentPosition.offset)
         val className = PsiTreeUtil.getParentOfType(element, PsiClass::class.java)?.qualifiedName
@@ -107,7 +106,7 @@ class DebuggerListener : XDebuggerManagerListener {
         val dataDependencies = dependencies?.data
         val controlDependencies = dependencies?.control
         // Update UI
-        dataDepPanel.updateDependencies(dataDependencies)
-        controlDepPanel.updateDependencies(controlDependencies)
+        dataPanel.updateDependencies(dataDependencies)
+        controlPanel.updateDependencies(controlDependencies)
     }
 }

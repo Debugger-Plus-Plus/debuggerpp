@@ -1,8 +1,10 @@
 package team57.debuggerpp.ui.dependencies
 
+import com.intellij.openapi.project.Project
 import team57.debuggerpp.slicer.ProgramSlice
 
-class ControlDependenciesPanel : DependenciesPanel() {
+
+class ControlDependenciesPanel(project: Project) : DependenciesPanel(project) {
     fun updateDependencies(dependencies: ProgramSlice.ControlDependencies?) {
         removeAll()
         if (dependencies == null) {
@@ -18,7 +20,6 @@ class ControlDependenciesPanel : DependenciesPanel() {
 
     private fun updateDependencies(dependencies: Collection<ProgramSlice.ControlDependency>) {
         for (dependency in dependencies) {
-//            JavaPsiFacade.getInstance(project).findClass()
             addDependencyLine("", dependency)
         }
         if (dependencies.isEmpty())
