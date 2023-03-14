@@ -1,7 +1,6 @@
 package team57.debuggerpp
 
 import com.automation.remarks.junit5.Video
-import com.intellij.psi.util.PsiMatchers.hasText
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.data.RemoteComponent
 import com.intellij.remoterobot.fixtures.ComponentFixture
