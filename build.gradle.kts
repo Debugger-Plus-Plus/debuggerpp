@@ -38,28 +38,6 @@ dependencies {
     // Video Recording
     implementation ("com.automation-remarks:video-recorder-junit5:2.0")
 }
-//
-//runIdeForUiTests {
-////    In case your Idea is launched on remote machine you can enable public port and enable encryption of JS calls
-////    systemProperty "robot-server.host.public", "true"
-////    systemProperty "robot.encryption.enabled", "true"
-////    systemProperty "robot.encryption.password", "my super secret"
-//
-//    systemProperty "robot-server.port", "8082"
-//    systemProperty "ide.mac.message.dialogs.as.sheets", "false"
-//    systemProperty "jb.privacy.policy.text", "<!--999.999-->"
-//    systemProperty "jb.consents.confirmation.enabled", "false"
-//    systemProperty "ide.mac.file.chooser.native", "false"
-//    systemProperty "jbScreenMenuBar.enabled", "false"
-//    systemProperty "apple.laf.useScreenMenuBar", "false"
-//    systemProperty "idea.trust.all.projects", "true"
-//    systemProperty "ide.show.tips.on.startup.default.value", "false"
-////    systemProperty "eap.require.license", "true"
-//}
-//
-//test {
-//    useJUnitPlatform()
-//}
 
 tasks {
     // Set the JVM compatibility versions
@@ -74,6 +52,24 @@ tasks {
     patchPluginXml {
         sinceBuild.set("222")
         untilBuild.set("223.*")
+    }
+
+    downloadRobotServerPlugin {
+        version.set("0.11.18")
+    }
+
+    runIdeForUiTests {
+        systemProperty("robot-server.port", "8082")
+        systemProperty("jb.privacy.policy.text", "<!--999.999-->")
+        systemProperty("jb.consents.confirmation.enabled", "false")
+        systemProperty("ide.mac.message.dialogs.as.sheets", "false")
+        systemProperty("ide.mac.file.chooser.native", "false")
+        systemProperty("apple.laf.useScreenMenuBar", "false")
+        systemProperty("idea.trust.all.projects", "true")
+        systemProperty("ide.show.tips.on.startup.default.value", "false")
+        systemProperty("jbScreenMenuBar.enabled", "false")
+        systemProperty("idea.trust.all.projects", "true")
+        systemProperty("ide.show.tips.on.startup.default.value", "false")
     }
 
     signPlugin {
