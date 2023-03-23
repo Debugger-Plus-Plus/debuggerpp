@@ -124,6 +124,19 @@ class JavaSlicer {
         return Pair(state, processDirs)
     }
 
+    fun instrumentJar(inJarPath: String, outJarPath: String, staticLogPath: String, outputDirectory: Path) {
+        val sootOutputDirectory = outputDirectory.resolve("soot-output")
+        sootOutputDirectory.toFile().mkdir()
+        JavaInstrumenter(outJarPath)
+            .instrumentJar(
+                "",
+                staticLogPath,
+                inJarPath,
+                loggerPath,
+                sootOutputDirectory.pathString
+            )
+    }
+
     fun collectTrace(executionResult: ExecutionResult, outputDirectory: Path, staticLog: Path): Trace {
         val stdoutLog = outputDirectory.resolve("instrumented-stdout.log")
 
@@ -216,7 +229,7 @@ class JavaSlicer {
         }
     }
 
-    private fun slice(
+    fun slice(
         outDir: String, icdg: DynamicControlFlowGraph, processDirectories: List<String?>?,
         backwardSlicePositions: List<Int?>, stubDroidPath: String?, taintWrapperPath: String?,
         frameworkPath: String?, variableString: String?, frameworkModel: Boolean, sliceOnce: Boolean
