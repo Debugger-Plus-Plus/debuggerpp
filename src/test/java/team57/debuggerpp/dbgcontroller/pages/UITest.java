@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
+import static org.testng.Assert.assertTrue;
 
 @Test
 public class UITest {
@@ -31,7 +32,9 @@ public class UITest {
 
     @Test
     public static void setupClass() throws InterruptedException{
-        System.out.println("Set up");
+        String javaVersion = System.getProperty("java.version");
+        assertTrue(javaVersion.startsWith("11"));
+        System.out.println("Set up, " + javaVersion);
         robot = new RemoteRobot("http://127.0.0.1:8082");
 
         final var projectRootDir = new File("src/test/TestProject").getAbsolutePath();
