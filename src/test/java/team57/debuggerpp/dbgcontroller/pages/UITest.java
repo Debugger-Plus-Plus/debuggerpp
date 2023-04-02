@@ -45,9 +45,9 @@ public class UITest {
 
             // Open the rover project
             JTextFieldFixture projectSelectionField = robot.find(JTextFieldFixture.class, byXpath("//div[@class='BorderlessTextField']"));
-            projectSelectionField.setText("");
+            Thread.sleep(3000);
             projectSelectionField.setText(projectRootDir);
-            Thread.sleep(5000);
+            Thread.sleep(3000);
             robot.find(JButtonFixture.class, byXpath("//div[@text='OK']")).clickWhenEnabled();
 
             while (robot.getFinder().findMany(byXpath("//div[@text='Trust Project']")).isEmpty()) {
@@ -63,7 +63,7 @@ public class UITest {
         }
 
         JTreeFixture projectTree = robot.find(JTreeFixture.class, projectTreeLocator);
-        projectTree.expand("src");
+        projectTree.expand("TestProject", "src", "Main");
 
         try {
             robot.find(JTreeFixture.class, projectTreeLocator).doubleClickPath(new String[]{"src", "Main.java"}, true);
