@@ -63,14 +63,12 @@ public class UITest {
         }
 
         JTreeFixture projectTree = robot.find(JTreeFixture.class, projectTreeLocator);
-        projectTree.expand("rover", "src", "main", "java", "rover", "rover");
+        projectTree.expand("src");
 
         try {
-            robot.find(JTreeFixture.class, projectTreeLocator).doubleClickPath(new String[]{"rover", "src", "main", "java", "rover", "rover"}, true);
-            robot.find(JTreeFixture.class, projectTreeLocator).doubleClickPath(new String[]{"rover", "src", "main", "java", "rover", "RoverTest"}, true);
+            robot.find(JTreeFixture.class, projectTreeLocator).doubleClickPath(new String[]{"src", "Main.java"}, true);
         } catch (Exception e) {
-            robot.find(JTreeFixture.class, projectTreeLocator).doubleClickPath(new String[]{"rover", "src", "main.java.rover", "rover"}, true);
-            robot.find(JTreeFixture.class, projectTreeLocator).doubleClickPath(new String[]{"rover", "src", "main.java.rover", "RoverTest"}, true);
+            robot.find(JTreeFixture.class, projectTreeLocator).doubleClickPath(new String[]{"src", "Main"}, true);
         }
 
 //        if (robot.getFinder().findMany(TABLE_LOCATOR).isEmpty()) {
