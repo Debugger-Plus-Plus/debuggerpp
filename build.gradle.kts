@@ -25,8 +25,8 @@ dependencies {
     implementation(project(":vendor:slicer4j:Slicer4J", "default"))
     implementation("org.testng:testng:7.1.0")
 
-    testImplementation("com.intellij.remoterobot:remote-robot:0.11.13")
-    testImplementation ("com.intellij.remoterobot:remote-fixtures:0.11.13")
+    testImplementation("com.intellij.remoterobot:remote-robot:0.11.18")
+    testImplementation ("com.intellij.remoterobot:remote-fixtures:0.11.18")
     testImplementation ("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testImplementation ("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine:5.9.2")
@@ -55,7 +55,7 @@ tasks {
     }
 
     downloadRobotServerPlugin {
-        version.set("0.11.13")
+        version.set("0.11.18")
     }
 
     runIdeForUiTests {
