@@ -6,8 +6,10 @@ import com.intellij.remoterobot.fixtures.JTextFieldFixture;
 import com.intellij.remoterobot.fixtures.JTreeFixture;
 import com.intellij.remoterobot.search.locators.Locator;
 import com.intellij.remoterobot.utils.Keyboard;
+import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.runners.MethodSorters;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -17,6 +19,7 @@ import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 import static org.testng.Assert.assertTrue;
 
 @Test
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UITest {
     private static RemoteRobot robot;
     private static final Locator DEBUGGER_PP_UP_BTN = byXpath("//div[@class='ActionButton' and @myaction='Debug with Dynamic Slicing using Debugger++ (Debug selected configuration with dynamic slicing using Debugger++)']");
@@ -36,7 +39,7 @@ public class UITest {
     }
 
     @BeforeAll
-    public static void setupClass() throws InterruptedException{
+    public static void setupClass() throws InterruptedException {
         String javaVersion = System.getProperty("java.version");
         assertTrue(javaVersion.startsWith("11"));
         System.out.println("Set up, " + javaVersion);
@@ -49,12 +52,9 @@ public class UITest {
             WelcomeFrameFixture welcomeFrame = robot.find(WelcomeFrameFixture.class);
             welcomeFrame.openProjectLink().doubleClick();
 
-            // Open the rover project
-            JTextFieldFixture projectSelectionField = robot.find(JTextFieldFixture.class, byXpath("//div[@class='BorderlessTextField']"));
-            Thread.sleep(3000);
+            JTextFieldFixture projectSelectionField = robot.find(JTextFieldFixture.class, byXpath("//div[@class='BorderlessTextField']"), Duration.ofSeconds(5));
             projectSelectionField.setText(projectRootDir);
-            Thread.sleep(3000);
-            robot.find(JButtonFixture.class, byXpath("//div[@text='OK']")).clickWhenEnabled();
+            robot.find(JButtonFixture.class, byXpath("//div[@text='OK']"), Duration.ofSeconds(5)).clickWhenEnabled();
 
 //            while (robot.getFinder().findMany(byXpath("//div[@text='Trust Project']")).isEmpty()) {
 //                Thread.sleep(2000);
@@ -67,11 +67,11 @@ public class UITest {
 //        System.out.println("Open project\n");
         Locator projectTreeLocator = byXpath("//div[@class='ProjectViewTree']");
         if (robot.getFinder().findMany(projectTreeLocator).isEmpty()) {
-            robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext='Project']"), Duration.ofSeconds(10)).clickWhenEnabled();
+            robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext='Project']"), Duration.ofSeconds(15)).clickWhenEnabled();
         }
 
         System.out.println("Get Project Tree\n");
-        JTreeFixture projectTree = robot.find(JTreeFixture.class, projectTreeLocator, Duration.ofSeconds(10));
+        JTreeFixture projectTree = robot.find(JTreeFixture.class, projectTreeLocator, Duration.ofSeconds(15));
         System.out.println("Received Project Tree\n");
         projectTree.expand("TestProject", "src", "Main");
 
@@ -95,8 +95,13 @@ public class UITest {
         Assertions.assertFalse(robot.getFinder().findMany(DEBUGGER_PP_UP_BTN).isEmpty());
     }
 
-
     @Test
+    public void mainTest() throws InterruptedException {
+        testDebuggerppBtnWithoutSlicingCriteria();
+        testDebuggerppBtnNothingMsg();
+        
+    }
+
     public void testDebuggerppBtnWithoutSlicingCriteria() throws InterruptedException {
         System.out.println("Click on Debugger Button");
         JButtonFixture debuggerppUpBtn = robot.find(JButtonFixture.class, DEBUGGER_PP_UP_BTN);
@@ -113,6 +118,15 @@ public class UITest {
         Assertions.assertTrue(robot.find(JButtonFixture.class, DEBUGGER_PP_DOWN_BTN).isEnabled());
         System.out.println("Debugger++ down button appeared");
         robot.find(JButtonFixture.class, byXpath("//div[@text.key='button.ok']")).click();
+    }
+
+    public void testDebuggerppBtnNothingMsg(){
+        if(!robot.getFinder().findMany(DEBUGGER_PP_DOWN_BTN).isEmpty()){
+            robot.find(JButtonFixture.class, DEBUGGER_PP_DOWN_BTN).click();
+            //display "nothing to show"
+            Assertions.assertFalse(robot.getFinder().findMany(byXpath("//div[@visible_text='Nothing to show']")).isEmpty());
+            robot.find(JButtonFixture.class, byXpath("//div[@myvisibleactions='[Show Options Menu (null), Hide (Hide active tool window)]']//div[@myaction.key='tool.window.hide.action.name']")).click();
+        }
     }
 
 //    private void runSlicer(Keyboard keyboard, String fileName, String lineNumber) {
