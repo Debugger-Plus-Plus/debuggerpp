@@ -1,6 +1,7 @@
 package team57.debuggerpp.dbgcontroller.pages;
 
 import com.intellij.remoterobot.RemoteRobot;
+import com.intellij.remoterobot.fixtures.*;
 import com.intellij.remoterobot.fixtures.ContainerFixture;
 import com.intellij.remoterobot.fixtures.JButtonFixture;
 import com.intellij.remoterobot.fixtures.JTextFieldFixture;
@@ -91,9 +92,12 @@ public class UITest {
         openProject();
         testDebuggerppBtnWithoutSlicingCriteria();
         testDebuggerppBtnNothingMsg();
+        testRightClick();
+        checkGrayoutLine();
     }
 
-    public void testDebuggerppBtnWithoutSlicingCriteria() throws InterruptedException {
+
+    private void testDebuggerppBtnWithoutSlicingCriteria() throws InterruptedException {
         System.out.println("Click on Debugger Button");
         JButtonFixture debuggerppUpBtn = robot.find(JButtonFixture.class, DEBUGGER_PP_UP_BTN);
         debuggerppUpBtn.clickWhenEnabled();
@@ -110,15 +114,46 @@ public class UITest {
         System.out.println("Debugger++ down button appeared");
         robot.find(JButtonFixture.class, byXpath("//div[@text.key='button.ok']")).click();
     }
-
-    public void testDebuggerppBtnNothingMsg(){
+    private void testDebuggerppBtnNothingMsg(){
         if(!robot.getFinder().findMany(DEBUGGER_PP_DOWN_BTN).isEmpty()){
             robot.find(JButtonFixture.class, DEBUGGER_PP_DOWN_BTN).click();
             //display "nothing to show"
             Assertions.assertFalse(robot.getFinder().findMany(byXpath("//div[@visible_text='Nothing to show']")).isEmpty());
             robot.find(JButtonFixture.class, byXpath("//div[@myvisibleactions='[Show Options Menu (null), Hide (Hide active tool window)]']//div[@myaction.key='tool.window.hide.action.name']")).click();
         }
+        else{
+            System.out.println("Cannot find expect element\n");
+        }
     }
+
+    private void testRightClick() throws InterruptedException {
+        if(!robot.getFinder().findMany(byXpath("//div[@class='EditorComponentImpl']")).isEmpty()){
+//            int offset = robot.find(EditorFixture.class, byXpath("//div[@class='EditorComponentImpl']")).getCaretOffset();
+            robot.find(EditorFixture.class, byXpath("//div[@class='EditorComponentImpl']")).clickOnOffset(609, MouseButton.RIGHT_BUTTON, 1);
+        }
+        else{
+            System.out.println("Cannot find expect element\n");
+        }
+        robot.find(JButtonFixture.class, byXpath("//div[@text='Start Slicing from Line']"), Duration.ofSeconds(10)).click();
+        Thread.sleep(5000);
+
+        //if there is a Decompiler Warning
+        if (!robot.getFinder().findMany(byXpath("//div[@class='DialogRootPane']")).isEmpty()) {
+            System.out.println("Warning window popped up\n");
+            robot.find(JButtonFixture.class, byXpath("//div[contains(@text.key, 'button.accept')]"), Duration.ofSeconds(10)).click();
+        }
+    }
+
+    private void checkGrayoutLine(){
+        //TODO
+    }
+
+    private void testExecutedLine(){
+
+    }
+
+
+
 
 //    private void runSlicer(Keyboard keyboard, String fileName, String lineNumber) {
 //        JTextFieldFixture file = robot.find(

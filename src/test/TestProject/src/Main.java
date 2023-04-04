@@ -7,21 +7,8 @@ public class Main {
         if (a > b) {
             System.out.println("ddd");
         }
-        int t = test2(2, 15);
+        int t = test(2, 15);
         System.out.println(t);
-    }
-    public static int test2(int x, int y) {
-        int b, c, d;
-        b = Integer.parseInt(String.valueOf(y / 3));
-        System.out.println("What");
-        c = Integer.parseInt(String.valueOf(y + 2));
-        System.out.println("What");
-        d = Integer.parseInt(String.valueOf(y + 5));
-        if (x > b || x > c && x > d) {
-            return 3;
-        } else {
-            return 4;
-        }
     }
     public static int test(int x, int y) {
         int z = y - 5;
