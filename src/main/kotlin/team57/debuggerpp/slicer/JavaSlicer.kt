@@ -57,12 +57,12 @@ class JavaSlicer {
 
     init {
         val loggerFile = createTempFile("slicer4-logger-", ".jar")
-        val loggerJar = Slicer::class.java.getResourceAsStream("/DynamicSlicingLogger.jar")!!
+        val loggerJar = JavaSlicer::class.java.getResourceAsStream("/DynamicSlicingLogger.jar")!!
         Files.copy(loggerJar, loggerFile, StandardCopyOption.REPLACE_EXISTING)
         loggerPath = loggerFile.toString()
 
         val modelsDirectory = createTempDirectory("slicer4-models-")
-        val modelsZip = Slicer::class.java.getResourceAsStream("/models.zip")!!
+        val modelsZip = JavaSlicer::class.java.getResourceAsStream("/models.zip")!!
         Utils.unzipAll(ZipInputStream(modelsZip), modelsDirectory)
         modelsPath = modelsDirectory.toString()
         stubDroidPath = modelsDirectory.resolve("summariesManual").toString()
