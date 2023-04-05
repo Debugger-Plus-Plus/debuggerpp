@@ -120,11 +120,11 @@ class JavaSlicer {
 
             else -> throw ExecutionException("Unable to instrument this type of RunProfileState")
         }
-        decompileAll(env.project, sootOutputDirectory) // Optional, for debugging purposes
+//        decompileAll(env.project, sootOutputDirectory) // Optional, for debugging purposes
         return Pair(state, processDirs)
     }
 
-    fun instrumentJar(inJarPath: String, outJarPath: String, staticLogPath: String, outputDirectory: Path) {
+    fun instrumentJar(inJarPath: String, staticLogPath: String, outputDirectory: Path, outJarPath: String) {
         val sootOutputDirectory = outputDirectory.resolve("soot-output")
         sootOutputDirectory.toFile().mkdir()
         JavaInstrumenter(outJarPath)
@@ -203,7 +203,7 @@ class JavaSlicer {
         }
     }
 
-    private fun saveTrace(trace: Trace, outputDirectory: Path) {
+    fun saveTrace(trace: Trace, outputDirectory: Path) {
         outputDirectory.resolve("trace.log")
             .bufferedWriter().use { writer ->
                 for (statement in trace) {
@@ -213,7 +213,7 @@ class JavaSlicer {
             }
     }
 
-    private fun extractRawTrace(stdoutLog: Path, outputDirectory: Path) {
+    fun extractRawTrace(stdoutLog: Path, outputDirectory: Path) {
         val rawTraceLog = outputDirectory.resolve("raw-trace.log")
         rawTraceLog.outputStream().use { os ->
             val inflaterOutputStream = InflaterOutputStream(os)
