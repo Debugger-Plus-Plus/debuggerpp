@@ -4,27 +4,28 @@ import com.intellij.remoterobot.RemoteRobot;
 import com.intellij.remoterobot.fixtures.*;
 import com.intellij.remoterobot.fixtures.ContainerFixture;
 import com.intellij.remoterobot.fixtures.JButtonFixture;
-import com.intellij.remoterobot.fixtures.JTextFieldFixture;
-import com.intellij.remoterobot.fixtures.JTreeFixture;
 import com.intellij.remoterobot.search.locators.Locator;
 import com.intellij.remoterobot.utils.Keyboard;
 import org.assertj.swing.core.MouseButton;
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.runners.MethodSorters;
 import org.testng.annotations.Test;
+import team57.debuggerpp.pages.EditorComponentImplFixture;
 import team57.debuggerpp.pages.IdeaFrame;
 import team57.debuggerpp.pages.WelcomeFrame;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 import static com.intellij.remoterobot.stepsProcessing.StepWorkerKt.step;
 import static com.intellij.remoterobot.utils.RepeatUtilsKt.waitFor;
 import static java.time.Duration.ofMinutes;
 import static java.time.Duration.ofSeconds;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 @Test
@@ -48,10 +49,7 @@ public class UITest {
     }
 
     public static void openProject() throws InterruptedException {
-        String javaVersion = System.getProperty("java.version");
-        assertTrue(javaVersion.startsWith("11"));
-        System.out.println("Set up, " + javaVersion);
-        robot = new RemoteRobot("http://127.0.0.1:8082");
+        System.out.println("Set up");
 
         if (!robot.getFinder().findMany(byXpath("//div[@class='FlatWelcomeFrame']")).isEmpty()) {
             System.out.println("Enter Welcome page");
@@ -89,11 +87,15 @@ public class UITest {
 
     @Test
     public void uiTestMain() throws InterruptedException {
+        String javaVersion = System.getProperty("java.version");
+        assertTrue(javaVersion.startsWith("11"));
+        robot = new RemoteRobot("http://127.0.0.1:8082");
+
         openProject();
         testDebuggerppBtnWithoutSlicingCriteria();
         testDebuggerppBtnNothingMsg();
         testRightClick();
-        checkGrayoutLine();
+        checkGreyedOutLines();
     }
 
 
@@ -144,8 +146,10 @@ public class UITest {
         }
     }
 
-    private void checkGrayoutLine(){
-        //TODO
+    private void checkGreyedOutLines() {
+        EditorComponentImplFixture idea = robot.find(EditorComponentImplFixture.class, ofSeconds(10));
+        HashSet<Integer> greyedOutLines = idea.getGreyedOutLines();
+        assertEquals(greyedOutLines, Set.of(2, 3, 5, 6, 7, 8, 10, 11, 12, 13, 16, 17, 20));
     }
 
     private void testExecutedLine(){

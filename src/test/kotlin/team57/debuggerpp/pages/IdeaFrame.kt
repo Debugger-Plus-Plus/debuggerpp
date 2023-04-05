@@ -16,7 +16,7 @@ fun RemoteRobot.idea(function: IdeaFrame.() -> Unit) {
 class IdeaFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : CommonContainerFixture(remoteRobot, remoteComponent) {
 
     val projectViewTree
-        get() = find<ContainerFixture>(byXpath("ProjectViewTree", "//div[@class='ProjectViewTree']"))
+        get() = find<ContainerFixture>(byXpath("ProjectViewTree", "//div[@class='ProjectViewTree']"), Duration.ofSeconds(10))
 
     val projectName
         get() = step("Get project name") { return@step callJs<String>("component.getProject().getName()") }
