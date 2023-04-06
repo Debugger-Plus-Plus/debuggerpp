@@ -61,6 +61,10 @@ public class UITest {
         // Open project file
         final IdeaFrame idea = robot.find(IdeaFrame.class, ofSeconds(10));
         waitFor(ofMinutes(5), () -> !idea.isDumbMode());
+        if (robot.getFinder().findMany(byXpath("//div[@class='ProjectViewTree']")).isEmpty()) {
+            robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext='Project']"), Duration.ofSeconds(10)).clickWhenEnabled();
+        }
+
         step("Open Main.java", () -> {
             final ContainerFixture projectView = idea.getProjectViewTree();
             if (!projectView.hasText("src")) {
@@ -103,9 +107,8 @@ public class UITest {
         System.out.println("Click on Debugger Button");
         JButtonFixture debuggerppUpBtn = robot.find(JButtonFixture.class, DEBUGGER_PP_UP_BTN);
         debuggerppUpBtn.clickWhenEnabled();
-        while(robot.getFinder().findMany(byXpath("//div[@class='MyDialog']")).isEmpty()){
-            Thread.sleep(2000);
-        }
+        waitFor(ofMinutes(1), () -> !robot.getFinder().findMany(byXpath("//div[@class='MyDialog']")).isEmpty());
+        Thread.sleep(1000);
         Assertions.assertFalse(robot.getFinder().findMany(byXpath("//div[@class='MyDialog']")).isEmpty());
         Assertions.assertTrue(robot.find(JButtonFixture.class, byXpath("//div[@text.key='button.ok']")).isEnabled());
         System.out.println("No Slicing Criteria Windows popped up");
