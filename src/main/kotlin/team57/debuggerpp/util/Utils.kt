@@ -75,7 +75,7 @@ class Utils {
         }
 
         @JvmStatic
-        fun readTextReplacingLineSeparator(path: Path) = path.readText().replace(System.getProperty("line.separator"), "\n").trim()
+        fun readTextReplacingLineSeparator(path: Path) = path.readText().replace("\r\n", "\n").trim()
 
         @JvmStatic
         fun getFileContentSha256(path: Path): String = org.apache.commons.codec.digest.DigestUtils.sha256Hex(
