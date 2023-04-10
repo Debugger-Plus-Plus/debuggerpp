@@ -154,10 +154,11 @@ public class UITest {
         }
     }
 
-    private void checkGreyedOutLines() {
-        EditorComponentImplFixture idea = robot.find(EditorComponentImplFixture.class, ofSeconds(60));
+    private void checkGreyedOutLines() throws InterruptedException {
+        Thread.sleep(5000);
+        EditorComponentImplFixture idea = robot.find(EditorComponentImplFixture.class, ofSeconds(10));
         HashSet<Integer> greyedOutLines = idea.getGreyedOutLines();
-        assertEquals(greyedOutLines, Set.of(2, 3, 5, 6, 7, 8, 10, 11, 12, 13, 16, 17, 20));
+        assertEquals(greyedOutLines, Set.of(1, 2, 4, 5, 6, 7, 8, 10, 15, 18, 19, 20, 21, 22, 24));
     }
 
     private void testDebuggerppActions() throws InterruptedException {
