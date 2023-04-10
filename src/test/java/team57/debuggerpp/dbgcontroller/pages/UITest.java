@@ -259,7 +259,7 @@ public class UITest {
         //step over
         Thread.sleep(500);
         robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepOver.text']"), Duration.ofSeconds(10)).click();
-        Thread.sleep(500);27
+        Thread.sleep(500);
         robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepOver.text']"), Duration.ofSeconds(10)).click();
 
         //run to cursor
