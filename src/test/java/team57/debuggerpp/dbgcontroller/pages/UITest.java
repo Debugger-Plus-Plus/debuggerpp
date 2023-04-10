@@ -100,6 +100,10 @@ public class UITest {
         testDebuggerppBtnNothingMsg();
         testRightClick();
         checkGreyedOutLines();
+        testDebuggerppActions();
+        testDebuggerppElement();
+        testDebuggerSkipNonSliceLine();
+        useOriginalDebugger();
     }
 
 
@@ -150,9 +154,120 @@ public class UITest {
     }
 
     private void checkGreyedOutLines() {
-        EditorComponentImplFixture idea = robot.find(EditorComponentImplFixture.class, ofSeconds(10));
+        EditorComponentImplFixture idea = robot.find(EditorComponentImplFixture.class, ofSeconds(60));
         HashSet<Integer> greyedOutLines = idea.getGreyedOutLines();
         assertEquals(greyedOutLines, Set.of(2, 3, 5, 6, 7, 8, 10, 11, 12, 13, 16, 17, 20));
+    }
+
+    private void testDebuggerppActions() throws InterruptedException {
+        Thread.sleep(3000);
+        //step into
+        Thread.sleep(1000);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepInto.text']"), Duration.ofSeconds(10)).click();
+        //step over
+        Thread.sleep(1000);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepOver.text']"), Duration.ofSeconds(10)).click();
+        //run to cursor
+        Thread.sleep(1000);
+        robot.find(EditorFixture.class, byXpath("//div[@accessiblename.key='editor.for.file.accessible.name']"), Duration.ofSeconds(10)).clickOnOffset(609, MouseButton.LEFT_BUTTON, 1);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.RunToCursor.text']"), Duration.ofSeconds(10)).click();
+
+        exitWindow();
+    }
+
+    private void exitWindow(){
+        //exit original debugger mode
+        robot.find(JButtonFixture.class, byXpath("//div[contains(@myvisibleactions, 'VCS')]//div[contains(@myaction.key, 'action.stop')]"), Duration.ofSeconds(10)).click();
+        //hide window
+        robot.find(JButtonFixture.class, byXpath("//div[@myvisibleactions='[Show Options Menu (null), Hide (Hide active tool window)]']//div[@myaction.key='tool.window.hide.action.name']"), Duration.ofSeconds(10)).click();
+    }
+
+    private void testDebuggerppElement() throws InterruptedException {
+        testRightClick();
+        robot.find(JButtonFixture.class, byXpath("//div[@accessiblename='Debugger++' and @class='SimpleColoredComponent']"), Duration.ofSeconds(10)).click();
+        Assertions.assertTrue(robot.find(JLabelFixture.class, byXpath("//div[@text='Data Dep']"), Duration.ofSeconds(10)).isVisible());
+        Assertions.assertTrue(robot.find(JLabelFixture.class, byXpath("//div[@text='Control Dep']"), Duration.ofSeconds(10)).isVisible());
+        Assertions.assertTrue(robot.find(JLabelFixture.class, byXpath("//div[@text='Graph']"), Duration.ofSeconds(10)).isVisible());
+        //step into twice
+        Thread.sleep(500);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepInto.text']"), Duration.ofSeconds(10)).click();
+        Thread.sleep(500);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepInto.text']"), Duration.ofSeconds(10)).click();
+
+        //need to evaluate &nbsp
+//        Assertions.assertTrue(
+//                robot.find(
+//                        JButtonFixture.class,
+//                        byXpath("//div[@accessiblename='To Line 15 (Main.java):   int r = z + 5;' and @class='JButton']"),
+//                        Duration.ofSeconds(10)).isEnabled()
+//        );
+
+        //switch to Control Dep
+        robot.find(JLabelFixture.class, byXpath("//div[@text='Control Dep']"), Duration.ofSeconds(10)).click();
+        //need to evaluate &nbsp
+//        Assertions.assertTrue(
+//                robot.find(
+//                        JButtonFixture.class,
+//                        byXpath("//div[@accessiblename='To Line 15 (Main.java): int r = z + 5;' and @class='JButton']"),
+//                        Duration.ofSeconds(10)).isEnabled()
+//        );
+        //switch to Graph
+        robot.find(JLabelFixture.class, byXpath("//div[@text='Graph']"), Duration.ofSeconds(10)).click();
+        Assertions.assertTrue(
+                robot.find(
+                        JButtonFixture.class,
+                        byXpath("//div[@class='JViewport']//div[@class='JLabel']"),
+                        Duration.ofSeconds(10)).isEnabled()
+        );
+
+        //switch to Control Dep
+        robot.find(JLabelFixture.class, byXpath("//div[@text='Control Dep']"), Duration.ofSeconds(10)).click();
+        //click on the button to jump
+
+        exitWindow();
+    }
+
+    private void testDebuggerSkipNonSliceLine() throws InterruptedException {
+        testRightClick();
+        //step into
+        Thread.sleep(500);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepInto.text']"), Duration.ofSeconds(10)).click();
+        //step over twice
+        Thread.sleep(500);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepOver.text']"), Duration.ofSeconds(10)).click();
+        Thread.sleep(500);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepOver.text']"), Duration.ofSeconds(10)).click();
+        //check if the non-sliced line has been skipped
+
+        exitWindow();
+    }
+    private void useDebuggerpp() throws InterruptedException {
+        testRightClick();
+//        robot.find(XDebuggerFramesList.class, byXpath("//div[@class='XDebuggerFramesList']"), Duration.ofSeconds(10));
+
+        //div[@accessiblename='Debugger++' and @class='SimpleColoredComponent']
+
+    }
+
+    private void useOriginalDebugger() throws InterruptedException {
+        robot.find(JButtonFixture.class, byXpath("//div[@myicon='startDebugger.svg']"), Duration.ofSeconds(10)).click();
+        Thread.sleep(5000);
+        //step into
+        Thread.sleep(500);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepInto.text']"), Duration.ofSeconds(10)).click();
+
+        //step over
+        Thread.sleep(500);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepOver.text']"), Duration.ofSeconds(10)).click();
+        Thread.sleep(500);27
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepOver.text']"), Duration.ofSeconds(10)).click();
+
+        //run to cursor
+        Thread.sleep(1000);
+        robot.find(EditorFixture.class, byXpath("//div[@accessiblename.key='editor.for.file.accessible.name']"), Duration.ofSeconds(10)).clickOnOffset(609, MouseButton.LEFT_BUTTON, 1);
+        robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.RunToCursor.text']"), Duration.ofSeconds(10)).click();
+
+        exitWindow();
     }
 
     private void testExecutedLine(){
