@@ -1,6 +1,7 @@
 package team57.debuggerpp.dbgcontroller.pages;
 
 import com.intellij.remoterobot.RemoteRobot;
+import com.intellij.remoterobot.data.RemoteComponent;
 import com.intellij.remoterobot.fixtures.*;
 import com.intellij.remoterobot.fixtures.ContainerFixture;
 import com.intellij.remoterobot.fixtures.JButtonFixture;
@@ -175,13 +176,6 @@ public class UITest {
         exitWindow();
     }
 
-    private void exitWindow(){
-        //exit original debugger mode
-        robot.find(JButtonFixture.class, byXpath("//div[contains(@myvisibleactions, 'VCS')]//div[contains(@myaction.key, 'action.stop')]"), Duration.ofSeconds(10)).click();
-        //hide window
-        robot.find(JButtonFixture.class, byXpath("//div[@myvisibleactions='[Show Options Menu (null), Hide (Hide active tool window)]']//div[@myaction.key='tool.window.hide.action.name']"), Duration.ofSeconds(10)).click();
-    }
-
     private void testDebuggerppElement() throws InterruptedException {
         testRightClick();
         robot.find(JButtonFixture.class, byXpath("//div[@accessiblename='Debugger++' and @class='SimpleColoredComponent']"), Duration.ofSeconds(10)).click();
@@ -193,24 +187,21 @@ public class UITest {
         robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepInto.text']"), Duration.ofSeconds(10)).click();
         Thread.sleep(500);
         robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepInto.text']"), Duration.ofSeconds(10)).click();
-
-        //need to evaluate &nbsp
-//        Assertions.assertTrue(
-//                robot.find(
-//                        JButtonFixture.class,
-//                        byXpath("//div[@accessiblename='To Line 15 (Main.java):   int r = z + 5;' and @class='JButton']"),
-//                        Duration.ofSeconds(10)).isEnabled()
-//        );
+        Assertions.assertTrue(
+                robot.find(
+                        JButtonFixture.class,
+                        byXpath("//div[@accessiblename='To Line 15 (Main.java):\u00A0\u00A0 int r = z + 5;' and @class='JButton']"),
+                        Duration.ofSeconds(10)).isEnabled()
+        );
 
         //switch to Control Dep
         robot.find(JLabelFixture.class, byXpath("//div[@text='Control Dep']"), Duration.ofSeconds(10)).click();
-        //need to evaluate &nbsp
-//        Assertions.assertTrue(
-//                robot.find(
-//                        JButtonFixture.class,
-//                        byXpath("//div[@accessiblename='To Line 15 (Main.java): int r = z + 5;' and @class='JButton']"),
-//                        Duration.ofSeconds(10)).isEnabled()
-//        );
+        Assertions.assertTrue(
+                robot.find(
+                        JButtonFixture.class,
+                        byXpath("//div[@accessiblename='To Line 15 (Main.java):\u00A0\u00A0 int r = z + 5;' and @class='JButton']"),
+                        Duration.ofSeconds(10)).isEnabled()
+        );
         //switch to Graph
         robot.find(JLabelFixture.class, byXpath("//div[@text='Graph']"), Duration.ofSeconds(10)).click();
         Assertions.assertTrue(
@@ -270,31 +261,10 @@ public class UITest {
         exitWindow();
     }
 
-    private void testExecutedLine(){
-
+    private void exitWindow(){
+        //exit original debugger mode
+        robot.find(JButtonFixture.class, byXpath("//div[contains(@myvisibleactions, 'VCS')]//div[contains(@myaction.key, 'action.stop')]"), Duration.ofSeconds(10)).click();
+        //hide window
+        robot.find(JButtonFixture.class, byXpath("//div[@myvisibleactions='[Show Options Menu (null), Hide (Hide active tool window)]']//div[@myaction.key='tool.window.hide.action.name']"), Duration.ofSeconds(10)).click();
     }
-
-
-
-
-//    private void runSlicer(Keyboard keyboard, String fileName, String lineNumber) {
-//        JTextFieldFixture file = robot.find(
-//                JTextFieldFixture.class,
-//                byXpath("//div[@accessiblename='Slicing Criterion']//div[@class='TextFieldWithBrowseButton']")
-//        );
-//        JTextFieldFixture line = robot.find(
-//                JTextFieldFixture.class,
-//                byXpath("//div[@accessiblename='Slicing Criterion']//div[@class='JTextField']")
-//        );
-//
-//        file.click();
-//        clearAndWrite(keyboard, fileName);
-//        line.click();
-//        clearAndWrite(keyboard, lineNumber);
-//        keyboard.enter();
-//    }
-//
-//    public void runSlicer(String fileName, String lineNumber) {
-//        runSlicer(new Keyboard(robot), fileName, lineNumber);
-//    }
 }
