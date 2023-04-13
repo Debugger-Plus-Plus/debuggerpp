@@ -222,8 +222,15 @@ public class UITest {
     private void testDebuggerSkipNonSliceLine() throws InterruptedException {
         testRightClick();
         //step into
-        Thread.sleep(500);
+        Thread.sleep(15000);
+        waitFor(Duration.ofSeconds(10), ()-> !robot.getFinder().findMany(byXpath("//div[@class='XDebuggerFramesList'][@visible_text='main:10, Main']")).isEmpty());
+
         robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepInto.text']"), Duration.ofSeconds(10)).click();
+
+//        waitFor(ofMinutes(1), () -> !robot.getFinder().findMany(byXpath("//div[@class='XDebuggerFramesList']")).isEmpty());
+//        List<RemoteComponent> a = robot.getFinder().findMany(byXpath("//div[@class='XDebuggerFramesList'][@visible_text='main:10, Main']"));
+
+        waitFor(Duration.ofSeconds(10), ()-> !robot.getFinder().findMany(byXpath("//div[@class='XDebuggerFramesList'][@visible_text='test:14, Main']")).isEmpty());
         //step over twice
         Thread.sleep(500);
         robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepOver.text']"), Duration.ofSeconds(10)).click();
