@@ -230,7 +230,8 @@ public class UITest {
 //        waitFor(ofMinutes(1), () -> !robot.getFinder().findMany(byXpath("//div[@class='XDebuggerFramesList']")).isEmpty());
 //        List<RemoteComponent> a = robot.getFinder().findMany(byXpath("//div[@class='XDebuggerFramesList'][@visible_text='main:10, Main']"));
 
-        waitFor(Duration.ofSeconds(10), ()-> !robot.getFinder().findMany(byXpath("//div[@class='XDebuggerFramesList'][@visible_text='test:14, Main']")).isEmpty());
+        // Check stack frame
+        waitFor(Duration.ofSeconds(10), ()-> !robot.getFinder().findMany(byXpath("//div[@class='XDebuggerFramesList'][@visible_text='test:14, Main || main:10, Main']")).isEmpty());
         //step over twice
         Thread.sleep(500);
         robot.find(JButtonFixture.class, byXpath("//div[@tooltiptext.key='action.StepOver.text']"), Duration.ofSeconds(10)).click();
