@@ -104,7 +104,13 @@ class JavaSlicer {
             is JavaCommandLineState -> {
                 val params = state.javaParameters
                 val jdkPath = params.jdkPath
-                val instrumentClassPaths = params.classPath.pathList.filterNot { it.startsWith(jdkPath) }
+                val instrumentClassPaths = params.classPath.pathList.filterNot {
+                    it.startsWith(jdkPath) ||
+                            it.matches(Regex(".*[\\\\/]junit-[\\d.]*\\.jar")) || // Skip JUnit
+                            it.matches(Regex(".*[\\\\/]hamcrest-core-[\\d.]*\\.jar")) || // Skip hamcrest
+                            it.matches(Regex(".*[\\\\/]com.jetbrains.intellij.idea[\\\\/]ideaIC[\\\\/].*\\.jar")) // Skip Idea
+                }
+                LOG.info("Instrument Class paths: $instrumentClassPaths")
                 val instrumentedClasPaths = JavaInstrumenter()
                     .instrumentClassPaths(
                         instrumentationOptions,
@@ -120,8 +126,35 @@ class JavaSlicer {
 
             else -> throw ExecutionException("Unable to instrument this type of RunProfileState")
         }
-        decompileAll(env.project, sootOutputDirectory) // Optional, for debugging purposes
+//        decompileAll(env.project, sootOutputDirectory) // Optional, for debugging purposes
         return Pair(state, processDirs)
+    }
+
+    fun collectTrace(executionResult: ExecutionResult, outputDirectory: Path, staticLog: Path): Trace {
+        val stdoutLog = outputDirectory.resolve("instrumented-stdout.log")
+        val stderrLog = outputDirectory.resolve("instrumented-stderr.log")
+
+        stdoutLog.bufferedWriter().use { stdWriter ->
+            stderrLog.bufferedWriter().use { errWriter ->
+                executionResult.processHandler.addProcessListener(object : ProcessAdapter() {
+                    override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
+                        if (outputType === ProcessOutputTypes.STDOUT) {
+                            stdWriter.write(event.text)
+                        } else if (outputType == ProcessOutputTypes.STDERR) {
+                            errWriter.write(event.text)
+                        }
+                    }
+                })
+                executionResult.processHandler.startNotify()
+                executionResult.processHandler.waitFor()
+            }
+        }
+
+        val trace = Parser.readFile(stdoutLog.pathString, staticLog.pathString)
+        saveTrace(trace, outputDirectory)
+        extractRawTrace(stdoutLog, outputDirectory)
+
+        return trace
     }
 
     fun instrumentJar(inJarPath: String, staticLogPath: String, outputDirectory: Path, outJarPath: String) {
@@ -135,28 +168,6 @@ class JavaSlicer {
                 loggerPath,
                 sootOutputDirectory.pathString
             )
-    }
-
-    fun collectTrace(executionResult: ExecutionResult, outputDirectory: Path, staticLog: Path): Trace {
-        val stdoutLog = outputDirectory.resolve("instrumented-stdout.log")
-
-        stdoutLog.bufferedWriter().use { writer ->
-            executionResult.processHandler.addProcessListener(object : ProcessAdapter() {
-                override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
-                    if (outputType === ProcessOutputTypes.STDOUT) {
-                        writer.write(event.text)
-                    }
-                }
-            })
-            executionResult.processHandler.startNotify()
-            executionResult.processHandler.waitFor()
-        }
-
-        val trace = Parser.readFile(stdoutLog.pathString, staticLog.pathString)
-        saveTrace(trace, outputDirectory)
-        extractRawTrace(stdoutLog, outputDirectory)
-
-        return trace
     }
 
     fun createDynamicControlFlowGraph(output: Path, trace: Trace, processDirs: List<String>): DynamicControlFlowGraph {

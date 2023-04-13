@@ -9,8 +9,10 @@ import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.*
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.RunContentDescriptor
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.ui.Messages
@@ -43,6 +45,7 @@ class DynamicSliceDebuggerRunner : GenericDebuggerRunner() {
         executorId == DynamicSliceDebuggerExecutor.EXECUTOR_ID
 
     override fun execute(environment: ExecutionEnvironment) {
+        LOG.info("Version: ${PluginManagerCore.getPlugin(PluginId.getId("team57.debuggerpp"))!!.version}")
         Patch.forceSetDelegatedRunProfile(environment.runProfile, environment.runProfile)
         super.execute(environment)
     }
@@ -100,6 +103,7 @@ class DynamicSliceDebuggerRunner : GenericDebuggerRunner() {
             object : Task.WithResult<ProgramSlice, Exception>(env.project, "Executing Dynamic Slicing", true) {
                 override fun compute(indicator: ProgressIndicator): ProgramSlice? {
                     val outputDirectory = kotlin.io.path.createTempDirectory("slicer4j-outputs-")
+//                    Desktop.getDesktop().open(outputDirectory.toFile())
 
                     // *** for temp test used only ***
 //                    val testOutputDirectory = Files.createDirectories(Paths.get("src\\test\\kotlin\\team57\\debuggerpp\\execute\\generatedFile"));
